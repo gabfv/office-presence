@@ -50,6 +50,7 @@ function onInvalidSubmit({ values, errors, results}) {
 }
 
 async function onSubmit(values, { resetForm }) {
+    loading.value = true;
     const isEmailValid = await validateEmailDomain(values.email);
 
     if (!isEmailValid) {
@@ -60,6 +61,7 @@ async function onSubmit(values, { resetForm }) {
     }
 
     resetForm();
+    loading.value = false;
 }
 
 async function loginHandler() {
@@ -126,7 +128,7 @@ async function loginHandler() {
             <div class="flex justify-between gap-4 items-start">
                 <button :disabled="loading" type="submit"
                     class="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0">
-                    Send magic link
+                    {{ loading ? 'Loading...' : 'Sign in with magic link!' }}
                 </button>
             </div>
         </Form>
