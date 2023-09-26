@@ -1,50 +1,57 @@
 <script setup>
-    import { ref } from 'vue';
-    import altogic from '@/libs/altogic';
-    import validateEmailDomain from '@/libs/emailDomain';
-    import { useRouter } from 'vue-router';
+import { ref } from 'vue';
+import { supabase } from '@/libs/supabase';
+import validateEmailDomain from '@/libs/emailDomain';
+import { useRouter } from 'vue-router';
 
-    const router = useRouter();
+const router = useRouter();
 
-    const successMessage = ref('');
-    const loading = ref(false);
-    const email = ref('');
-    let errors = ref(null);
-    async function loginHandler() {
-        loading.value = true;
-        errors.value = null;
+const successMessage = ref('');
+const loading = ref(false);
+const email = ref('');
+let errors = ref(null);
+async function loginHandler() {
+    loading.value = true;
+    errors.value = null;
 
-        if (!validateEmailDomain(email.value)) {
-            errors.value = { items: [{ message: 'Invalid email address!' }] };
-            console.log('invalid email')
-            loading.value = false;
-            return;
-        }
-
-        const { errors: apiErrors } = await altogic.auth.sendMagicLinkEmail(email.value);
+    if (!validateEmailDomain(email.value)) { // TODO: use edge functions to validate email domain
+        errors.value = { items: [{ message: 'Invalid email address!' }] };
+        console.log('invalid email')
         loading.value = false;
-        let emailAddress = email.value;
+        return;
+    }
+
+    // get full name from email address
+    let fullName = email.value.split('@')[0];
+    if (fullName.includes('.')) {
+        fullName = fullName.split('.').map((name) => name.charAt(0).toUpperCase() + name.slice(1)).join(' ');
+    } else {
+        fullName = fullName.charAt(0).toUpperCase() + fullName.slice(1);
+    }
+
+    let { data, error } = await supabase.auth.signInWithOtp({
+        email: email.value,
+        options: {
+            shouldCreateUser: true,
+            data: {
+                full_name: fullName,
+            },
+        },
+    });
+    loading.value = false;
+    email.value = '';
+    if (error) {
+        // register with magic link
+        errors.value = { items: [{ message: 'Sign in with magic link failed!' }] };
+        console.log('Sign in with magic link failed!');
+        console.log(error.message);
+    } else {
         successMessage.value = 'Email sent! Check your inbox.';
-        email.value = '';
-        if (apiErrors) {
-            // register with magic link
-            await registerMagicLink(emailAddress);
-
-        }
-    };
-    async function registerMagicLink(emailAddress) {
-        // get name from all characters before @
-        let name = emailAddress.split('@')[0];
-        // generate a random pw
-        let password = Math.random().toString(36).slice(-32);
-        loading.value = true;
-        errors.value = null;
-        const { errors: apiErrors } = await altogic.auth.signUpWithEmail(emailAddress, password, name);
-        loading.value = false;
-        if (apiErrors) {
-            console.log('Magic link failed!')
-        }
-    };
+        setTimeout(() => {
+            successMessage.value = '';
+        }, 5000);
+    }
+};
 </script>
 
 <template>
@@ -58,11 +65,8 @@
 
             <input v-model="email" type="email" placeholder="Type your email" required />
             <div class="flex justify-between gap-4 items-start">
-                <button
-                    :disabled="loading"
-                    type="submit"
-                    class="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0"
-                >
+                <button :disabled="loading" type="submit"
+                    class="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0">
                     Send magic link
                 </button>
             </div>

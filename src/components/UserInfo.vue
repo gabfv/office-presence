@@ -1,10 +1,9 @@
 <script setup>
-    import { useAuthStore } from '../stores/auth';
-    import altogic from '../libs/altogic';
+    import { auth } from '@/stores/auth';
+    import { supabase } from '@/libs/supabase';
     import { ref } from 'vue';
-    const auth = useAuthStore();
 
-    const username = ref(auth?.user?.name);
+    const username = ref(auth?.state?.user?.user_metadata?.full_name);
     const loading = ref(false);
     const inputRef = ref(null);
     const changeMode = ref(false);
@@ -17,32 +16,13 @@
         }, 100);
     }
 
-    async function saveName() {
-        loading.value = true;
-        errors.value = null;
-
-        const { data, errors: apiErrors } = await altogic.db
-            .model('users')
-            .object(auth.user._id)
-            .update({ name: username.value });
-
-        if (apiErrors) {
-            errors.value = apiErrors.items[0].message;
-        } else {
-            username.value = data.name;
-            auth.setUser(data);
-        }
-
-        loading.value = false;
-        changeMode.value = false;
-    }
+    //TODO: update user full name.
 </script>
 
 <template>
     <section class="border p-4 w-full">
         <div class="flex items-center justify-center" v-if="changeMode">
             <input
-                @keyup.enter="saveName"
                 ref="inputRef"
                 type="text"
                 v-model="username"
@@ -50,7 +30,7 @@
             />
         </div>
         <div class="space-y-4" v-else>
-            <h1 class="text-3xl">Hello, {{ auth?.user?.name }}</h1>
+            <h1 class="text-3xl">Hello, {{ auth?.state?.user?.user_metadata?.full_name }}</h1>
             <button @click="openChangeMode" class="border p-2">Change name</button>
         </div>
         <div v-if="errors">{{ errors }}</div>

@@ -1,10 +1,35 @@
-<script setup>
+<script>
 import { RouterLink, RouterView } from 'vue-router'
-import { useAuthStore } from '@/stores/auth';
+import { auth } from '@/stores/auth';
+import { supabase } from '@/libs/supabase';
 import { Slide } from 'vue3-burger-menu'
 
-const auth = useAuthStore();
-
+export default {
+  name: 'App',
+  components: {
+    RouterLink,
+    RouterView,
+    Slide
+  },
+  setup() {
+    let { data, error } = supabase.auth.getSession();
+    if (error) {
+      console.log(error.message);
+    } else if (data) {
+      auth.state.user = data.user;
+    }
+    supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        auth.state.user = null;
+      } else if (event === 'SIGNED_IN') {
+        auth.state.user = session.user;
+      }
+    });
+    return {
+      auth,
+    };
+  },
+};
 </script>
 
 <template>
@@ -16,11 +41,11 @@ const auth = useAuthStore();
       <span>
         <RouterLink to="/about">About</RouterLink>
       </span>
-      <span v-if="!auth.session">
+      <span v-if="!auth.state.user">
         <RouterLink to="/login">Login</RouterLink>
       </span>
-      <span v-if="auth.session">
-        <RouterLink v-if="auth.session" to="/profile">Profile</RouterLink>
+      <span v-if="auth.state.user">
+        <RouterLink v-if="auth.state.user" to="/profile">Profile</RouterLink>
       </span>
     </Slide>
   </div>

@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomeView from '../views/HomeView.vue';
-import { useAuthStore } from '@/stores/auth';
+import HomeView from '@/views/HomeView.vue';
+import { auth } from '@/stores/auth';
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -14,49 +14,31 @@ const router = createRouter({
         {
             path: '/about',
             name: 'about',
-            component: () => import('../views/AboutView.vue'),
+            component: () => import('@/views/AboutView.vue'),
             // meta: { requiresGuest: true },
         },
         {
             path: '/profile',
             name: 'profile',
-            component: () => import('../views/ProfileView.vue'),
+            component: () => import('@/views/ProfileView.vue'),
             meta: { requiresAuth: true },
         },
         {
             path: '/login',
             name: 'login',
-            component: () => import('../views/LoginWithMagicLinkView.vue'),
-            meta: { requiresGuest: true },
-        },
-        {
-            path: '/login-with-magic-link',
-            name: 'magic-login',
-            component: () => import('../views/LoginWithMagicLinkView.vue'),
-            meta: { requiresGuest: true },
-        },
-        {
-            path: '/register',
-            name: 'register',
-            component: () => import('../views/RegisterView.vue'),
-            meta: { requiresGuest: true },
-        },
-        {
-            path: '/auth-redirect',
-            name: 'auth-redirect',
-            component: () => import('../views/AuthRedirectView.vue'),
+            component: () => import('@/views/LoginWithMagicLinkView.vue'),
             meta: { requiresGuest: true },
         },
     ],
 });
+
 router.beforeEach((to, from) => {
-    const auth = useAuthStore();
-    if (to.meta.requiresAuth && !auth.user) {
+    if (to.meta.requiresAuth && !auth.state.user.id) {
         return {
-            name: 'login',
+            name: 'login', 
         };
     }
-    if (to.meta.requiresGuest && auth.user) {
+    if (to.meta.requiresGuest && auth.state.user.id) {
         return {
             name: 'profile',
         };
