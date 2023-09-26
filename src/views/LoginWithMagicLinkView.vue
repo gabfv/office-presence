@@ -49,8 +49,8 @@ function onInvalidSubmit({ values, errors, results}) {
     }
 }
 
-function onSubmit(values, { resetForm }) {
-    const isEmailValid = validateEmailDomain(values.email);
+async function onSubmit(values, { resetForm }) {
+    const isEmailValid = await validateEmailDomain(values.email);
 
     if (!isEmailValid) {
         toast.error('Invalid email!');
