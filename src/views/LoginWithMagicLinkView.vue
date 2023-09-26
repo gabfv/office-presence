@@ -13,17 +13,12 @@ let router = useRouter();
 
 let loginSchema = toTypedSchema(
     yup.object({
-        email: yup.string().required().email().test({
-            name: 'email-domain',
-            message: 'Invalid email domain!',
-            test: value => validateEmailDomain(value),
-            exclusive: true,
-        }),
+        email: yup.string().required().email(),
     }),
 );
 
 let { errors, defineInputBinds } = useForm({
-  validationSchema: loginSchema,
+    validationSchema: loginSchema,
 });
 
 let email = defineInputBinds('email');
@@ -32,11 +27,20 @@ const successMessage = ref('');
 const loading = ref(false);
 
 async function validateEmailDomain(email) {
-    let domain = email.split('@')[1];
-    let { data, error } = await supabase.functions.invoke('validate_email_domains', {
-        domain: domain,
-    });
+    loginSchema
 
+    let domain = email.split('@')[1];
+    if (domain !== null) {
+        const { data, error } = await supabase.functions.invoke('validate-email-domain', {
+            body: {domain: domain,},
+        });
+        if (error) {
+            toast.error(error.message);
+            return false;
+        } else {
+            return data.isValid;
+        }
+    }
 }
 
 function onInvalidSubmit({ values, errors, results}) {
@@ -46,7 +50,14 @@ function onInvalidSubmit({ values, errors, results}) {
 }
 
 function onSubmit(values, { resetForm }) {
-    console.log(values);
+    const isEmailValid = validateEmailDomain(values.email);
+
+    if (!isEmailValid) {
+        toast.error('Invalid email!');
+        return;
+    } else {
+        //TODO: Proceed with login.
+    }
 
     resetForm();
 }
