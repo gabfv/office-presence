@@ -1,21 +1,64 @@
 <script setup>
 import { ref } from 'vue';
 import { supabase } from '@/libs/supabase';
-import validateEmailDomain from '@/libs/emailDomain';
+//import validateEmailDomain from '@/libs/emailDomain';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
+import { useForm, Field, Form, ErrorMessage } from 'vee-validate';
+import { toTypedSchema } from '@vee-validate/yup';
+import * as yup from 'yup'
 
 let toast = useToast();
+let router = useRouter();
 
-const router = useRouter();
+let loginSchema = toTypedSchema(
+    yup.object({
+        email: yup.string().required().email().test({
+            name: 'email-domain',
+            message: 'Invalid email domain!',
+            test: value => validateEmailDomain(value),
+            exclusive: true,
+        }),
+    }),
+);
+
+let { errors, defineInputBinds } = useForm({
+  validationSchema: loginSchema,
+});
+
+let email = defineInputBinds('email');
 
 const successMessage = ref('');
 const loading = ref(false);
-const email = ref('');
-let errors = ref(null);
+
+async function validateEmailDomain(email) {
+    let domain = email.split('@')[1];
+    let { data, error } = await supabase.functions.invoke('validate_email_domains', {
+        domain: domain,
+    });
+
+}
+
+function onInvalidSubmit({ values, errors, results}) {
+    for (let [key, value] of Object.entries(errors)) {
+        toast.error(value);
+    }
+}
+
+function onSubmit(values, { resetForm }) {
+    console.log(values);
+
+    resetForm();
+}
+
 async function loginHandler() {
     loading.value = true;
-    errors.value = null;
+
+
+    //TODO: use edge functions to validate email domain but validate email format locally first
+    // let { data, error } = await supabase.functions.invoke('validate_email_domains', {
+    //    email: email.value,
+    // });
 
     if (!validateEmailDomain(email.value)) { // TODO: use edge functions to validate email domain
         toast.error('Invalid email!');
@@ -66,15 +109,15 @@ async function loginHandler() {
 
 <template>
     <section class="flex flex-col items-center justify-center h-96 gap-4">
-        <form @submit.prevent="loginHandler" class="flex flex-col gap-2 w-full md:w-96">
+        <Form @submit="onSubmit" :validation-schema="loginSchema" @invalid-submit="onInvalidSubmit" class="flex flex-col gap-2 w-full md:w-96">
             <h1 class="self-start text-3xl font-bold">Login with magic link</h1>
-            <input v-model="email" type="email" placeholder="Type your email" required />
+            <Field v-bind="email" type="email" name="email" label="Email field" placeholder="Type your email" />
             <div class="flex justify-between gap-4 items-start">
                 <button :disabled="loading" type="submit"
                     class="border py-2 px-3 border-gray-500 hover:bg-gray-500 hover:text-white transition shrink-0">
                     Send magic link
                 </button>
             </div>
-        </form>
+        </Form>
     </section>
 </template>
