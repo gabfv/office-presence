@@ -1,6 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '@/views/HomeView.vue';
 import { auth } from '@/stores/auth';
+import { useToast } from 'vue-toast-notification';
+
+const toast = useToast();
 
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,6 +37,7 @@ const router = createRouter({
 
 router.beforeEach((to, from) => {
     if (to.meta.requiresAuth && !auth.state.user.id) {
+        toast.error('You must be logged in to access this page.');
         return {
             name: 'login', 
         };

@@ -1,35 +1,26 @@
-<script>
+<script setup>
 import { RouterLink, RouterView } from 'vue-router'
 import { auth } from '@/stores/auth';
 import { supabase } from '@/libs/supabase';
 import { Slide } from 'vue3-burger-menu'
+import { useToast } from 'vue-toast-notification'
 
-export default {
-  name: 'App',
-  components: {
-    RouterLink,
-    RouterView,
-    Slide
-  },
-  setup() {
-    let { data, error } = supabase.auth.getSession();
-    if (error) {
-      console.log(error.message);
-    } else if (data) {
-      auth.state.user = data.user;
-    }
-    supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_OUT') {
-        auth.state.user = null;
-      } else if (event === 'SIGNED_IN') {
-        auth.state.user = session.user;
-      }
-    });
-    return {
-      auth,
-    };
-  },
-};
+let toast = useToast();
+
+let { data, error } = supabase.auth.getSession();
+if (error) {
+  console.log(error.message);
+} else if (data) {
+  auth.state.user = data.user;
+}
+supabase.auth.onAuthStateChange((event, session) => {
+  if (event === 'SIGNED_OUT') {
+    toast.info('You have been signed out.');
+    auth.state.user = {};
+  } else if (event === 'SIGNED_IN') {
+    auth.state.user = session.user;
+  }
+});
 </script>
 
 <template>

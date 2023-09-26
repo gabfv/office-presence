@@ -2,13 +2,17 @@
 import { supabase } from '@/libs/supabase';
 import UserInfo from '@/components/UserInfo.vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
+
+let toast = useToast();
+let router = useRouter();
 
 async function logout() {
-    const router = useRouter();
     try {
         await supabase.auth.signOut();
-        router.push({ name: 'login' });
+        await router.push({ name: 'login' });
     } catch (error) {
+        toast.error('Logout failed!');
         console.log(error.message);
     }
 }

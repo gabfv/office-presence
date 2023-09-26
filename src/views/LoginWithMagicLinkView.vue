@@ -3,6 +3,9 @@ import { ref } from 'vue';
 import { supabase } from '@/libs/supabase';
 import validateEmailDomain from '@/libs/emailDomain';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
+
+let toast = useToast();
 
 const router = useRouter();
 
@@ -15,9 +18,11 @@ async function loginHandler() {
     errors.value = null;
 
     if (!validateEmailDomain(email.value)) { // TODO: use edge functions to validate email domain
-        errors.value = { items: [{ message: 'Invalid email address!' }] };
-        console.log('invalid email')
-        loading.value = false;
+        toast.error('Invalid email!');
+        console.log('invalid email');
+        setTimeout(() => {
+            loading.value = false;
+        }, 5000);
         return;
     }
 
@@ -41,11 +46,16 @@ async function loginHandler() {
     loading.value = false;
     email.value = '';
     if (error) {
-        // register with magic link
+        loading.value = true;
+        toast.error('Sign in with magic link failed!');
         errors.value = { items: [{ message: 'Sign in with magic link failed!' }] };
         console.log('Sign in with magic link failed!');
         console.log(error.message);
+        setTimeout(() => {
+            loading.value = false;
+        }, 5000);
     } else {
+        toast.success('Email sent! Check your inbox.');
         successMessage.value = 'Email sent! Check your inbox.';
         setTimeout(() => {
             successMessage.value = '';
@@ -58,11 +68,6 @@ async function loginHandler() {
     <section class="flex flex-col items-center justify-center h-96 gap-4">
         <form @submit.prevent="loginHandler" class="flex flex-col gap-2 w-full md:w-96">
             <h1 class="self-start text-3xl font-bold">Login with magic link</h1>
-            <div v-if="successMessage" class="bg-green-600 text-white text-[13px] p-2">{{ successMessage }}</div>
-            <div v-if="errors" class="bg-red-600 text-white text-[13px] p-2">
-                <p v-for="(error, index) in errors.items" :key="index">{{ error.message }}</p>
-            </div>
-
             <input v-model="email" type="email" placeholder="Type your email" required />
             <div class="flex justify-between gap-4 items-start">
                 <button :disabled="loading" type="submit"
