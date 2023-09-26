@@ -38,7 +38,7 @@ async function validateEmailDomain(email) {
             toast.error(error.message);
             return false;
         } else {
-            return data.isValid;
+            return data.valid;
         }
     }
 }
