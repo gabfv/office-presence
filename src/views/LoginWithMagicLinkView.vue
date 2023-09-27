@@ -55,13 +55,13 @@ async function onSubmit(values, { resetForm }) {
 
     if (!isEmailValid) {
         toast.error('Invalid email!');
+        loading.value = false;
         return;
     } else {
         //TODO: Proceed with login.
     }
 
     resetForm();
-    loading.value = false;
 }
 
 async function loginHandler() {
