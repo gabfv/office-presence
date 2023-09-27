@@ -11,6 +11,8 @@
     "@supabase/supabase-js": "^2.36.0",
     "@vee-validate/yup": "^4.11.7",
     "@vercel/analytics": "^1.0.2",
+    "pino": "^8.15.1",
+    "pino-logflare": "^0.4.2",
     "vee-validate": "^4.11.7",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",

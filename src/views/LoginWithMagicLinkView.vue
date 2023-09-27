@@ -7,6 +7,7 @@ import { useToast } from 'vue-toast-notification';
 import { useForm, Field, Form, ErrorMessage } from 'vee-validate';
 import { toTypedSchema } from '@vee-validate/yup';
 import * as yup from 'yup'
+import { logger } from '@/libs/logger';
 
 let toast = useToast();
 let router = useRouter();
@@ -54,6 +55,7 @@ async function onSubmit(values, { resetForm }) {
 
     if (!isEmailValid) {
         console.error('Invalid email used: ' + values.email);
+        logger.warn('Invalid email used: ' + values.email);
         toast.error('Invalid email!');
     } else {
         //TODO: Proceed with login.
