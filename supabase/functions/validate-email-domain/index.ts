@@ -3,9 +3,27 @@
 // This enables autocomplete, go to definition, etc.
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
-import { corsHeaders } from '../_shared/cors.ts'
+import { allowedOrigins } from '../_shared/cors.ts'
 
 const ACCEPTED_EMAIL_DOMAINS = Deno.env.get('ACCEPTED_EMAIL_DOMAINS_CSV').split(',');
+
+function validateCorsOrigin(req) {
+  let corsHeaders = {}
+  const origin = req.headers.get('origin')
+  if (!origin) {
+    console.log('No origin header from' + req.url)
+  }
+  else if (allowedOrigins.includes(origin)) {
+    corsHeaders = {
+      'Access-Control-Allow-Origin': origin,
+      'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    }
+  } else {
+    console.error('Invalid origin: ' + origin + ' for ' + req.url)
+  }
+
+  return corsHeaders
+}
 
 function validateEmailDomain(emailDomain: string) {
   return ACCEPTED_EMAIL_DOMAINS.includes(emailDomain);
@@ -13,6 +31,7 @@ function validateEmailDomain(emailDomain: string) {
 
 serve(async (req) => {
   // This is needed if you're planning to invoke your function from a browser.
+  const corsHeaders = validateCorsOrigin(req)
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
@@ -35,8 +54,8 @@ serve(async (req) => {
       },
     )
   } catch (error) {
-    console.log('returning error response' + error.message)
-    console.log('input value: ' + req.json().domain)
+    console.error('returning error response' + error.message)
+    console.error('input value: ' + req.json().domain)
     return new Response(JSON.stringify({ error: error.message }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
