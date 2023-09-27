@@ -53,6 +53,7 @@ async function onSubmit(values, { resetForm }) {
     loading.value = false;
 
     if (!isEmailValid) {
+        console.error('Invalid email used: ' + values.email);
         toast.error('Invalid email!');
     } else {
         //TODO: Proceed with login.
