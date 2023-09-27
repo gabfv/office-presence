@@ -20,6 +20,8 @@ Simple web app to display the presence of people in the office.
 - [ ] Remove a person from a team
 - [ ] Manage team leaders (add/remove; only team leaders can add/remove people from their team)
 - [ ] Add translation support
+- [ ] Add a language selector
+- [ ] Delete user account
 
 ### Future Features
 - [ ] Add light mode support (dark mode by default)
