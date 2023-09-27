@@ -27,8 +27,6 @@ const successMessage = ref('');
 const loading = ref(false);
 
 async function validateEmailDomain(email) {
-    loginSchema
-
     let domain = email.split('@')[1];
     if (domain !== null) {
         const { data, error } = await supabase.functions.invoke('validate-email-domain', {
@@ -52,10 +50,10 @@ function onInvalidSubmit({ values, errors, results}) {
 async function onSubmit(values, { resetForm }) {
     loading.value = true;
     const isEmailValid = await validateEmailDomain(values.email);
+    loading.value = false;
 
     if (!isEmailValid) {
         toast.error('Invalid email!');
-        loading.value = false;
         return;
     } else {
         //TODO: Proceed with login.
