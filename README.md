@@ -22,48 +22,93 @@ Simple web app to display the presence of people in the office.
 - [ ] Add translation support
 - [ ] Add a language selector
 - [ ] Delete user account
+- [ ] Add light mode support (dark mode by default)
 
 ### Future Features
-- [ ] Add light mode support (dark mode by default)
+
+- [ ] TBD
 
 ## Tech Stack
 
-Vue 3 in Vite using Supabase as a backend + Vercel for hosting.
+Nuxt 3 using Supabase as a backend + Vercel for hosting.
 
 ## Environment Variables
-
-### Possibly Required for Vercel (if not using Vercel's built-in Supabase integration)
-
-- `VITE_SUPABASE_URL` : URL of your Supabase project
-- `VITE_SUPABASE_ANON_KEY` : Anon key of your Supabase project
-
-### Required for Supabase edge functions
 
 - `ACCEPTED_EMAIL_DOMAINS_CSV` : Comma-separated list of accepted email domains
 - `CORS_ORIGIN` : Origin to allow CORS requests from (your own domain or Vercel's assigned domain to your app)
 
-## Recommended IDE Setup
+# Nuxt 3 Minimal Starter
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
 
-## Customize configuration
+## Setup
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+Make sure to install the dependencies:
 
-## Project Setup
-
-```sh
+```bash
+# npm
 npm install
+
+# pnpm
+pnpm install
+
+# yarn
+yarn install
+
+# bun
+bun install
 ```
 
-### Compile and Hot-Reload for Development
+## Development Server
 
-```sh
+Start the development server on `http://localhost:3000`:
+
+```bash
+# npm
 npm run dev
+
+# pnpm
+pnpm run dev
+
+# yarn
+yarn dev
+
+# bun
+bun run dev
 ```
 
-### Compile and Minify for Production
+## Production
 
-```sh
+Build the application for production:
+
+```bash
+# npm
 npm run build
+
+# pnpm
+pnpm run build
+
+# yarn
+yarn build
+
+# bun
+bun run build
 ```
+
+Locally preview production build:
+
+```bash
+# npm
+npm run preview
+
+# pnpm
+pnpm run preview
+
+# yarn
+yarn preview
+
+# bun
+bun run preview
+```
+
+Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.

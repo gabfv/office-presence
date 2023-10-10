@@ -1,1 +1,0 @@
-export const allowedOrigins = Deno.env.get('CORS_ORIGINS_CSV')?.split(',') || []
