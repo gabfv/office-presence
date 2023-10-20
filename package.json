@@ -8,7 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.36.0",
+    "@supabase/supabase-js": "^2.37.0",
     "@vee-validate/yup": "^4.11.7",
     "vee-validate": "^4.11.7",
     "vue": "^3.3.4",
