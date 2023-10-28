@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.36.0",
-    "@vee-validate/yup": "^4.11.7",
+    "@vee-validate/yup": "^4.11.8",
     "vee-validate": "^4.11.7",
     "vue": "^3.3.4",
     "vue-router": "^4.2.4",
